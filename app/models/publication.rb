@@ -5,4 +5,6 @@ class Publication < ApplicationRecord
 
   validates :title, presence: true
   validates :status, inclusion: { in: STATUSES }
+
+  scope :not_deleted, -> { where(deleted_at: nil) }
 end
