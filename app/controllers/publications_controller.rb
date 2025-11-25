@@ -4,9 +4,7 @@ class PublicationsController < ApplicationController
 
   # GET /publications
   def index
-    pubs = current_user.publications.not_deleted
-    pubs = pubs.where('title ILIKE ?', "%#{params[:title]}%") if params[:title].present?
-    pubs = pubs.where(status: params[:status]) if params[:status].present?
+    pubs = current_user.publications.active.search(params[:title]).status_filter(params[:status])
     pubs = pubs.order(created_at: :desc)
 
     render json: { items: pubs }, status: :ok
@@ -61,7 +59,7 @@ class PublicationsController < ApplicationController
 
   # GET /public/published
   def published
-    pubs = Publication.where(status: 'published', deleted_at: nil).order(created_at: :desc)
+    pubs = Publication.published_only.order(created_at: :desc)
 
     render json: { items: pubs }, status: :ok
   end
@@ -70,8 +68,6 @@ class PublicationsController < ApplicationController
 
   def set_publication
     @publication = current_user.publications.find(params[:id])
-  rescue ActiveRecord::RecordNotFound
-    render json: { error: 'Not Found' }, status: :not_found
   end
 
   def publication_params

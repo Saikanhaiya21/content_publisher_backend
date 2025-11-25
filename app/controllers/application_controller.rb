@@ -9,16 +9,16 @@ class ApplicationController < ActionController::API
 
   def authenticate_request!
     header = request.headers['Authorization']
-    header = header.split(' ').last if header
+    token = header.split(' ').last if header.present?
 
-    return render json: { error: 'Missing token' }, status: :unauthorized unless header
+    return render json: { error: 'Missing token' }, status: :unauthorized unless token
 
     begin
-      payload = JsonWebToken.decode(header)
+      payload = JsonWebToken.decode(token)
       @current_user = User.find(payload['user_id'])
     rescue JWT::ExpiredSignature
       render json: { error: 'Token expired' }, status: :unauthorized
-    rescue => e
+    rescue StandardError
       render json: { error: 'Not Authorized' }, status: :unauthorized
     end
   end

@@ -15,7 +15,7 @@ class AuthController < ApplicationController
     user = User.find_by(email: params[:email])
     if user&.authenticate(params[:password])
       token = JsonWebToken.encode(user_id: user.id)
-      render json: { token_token: token, user: response(user) }, status: :ok
+      render json: { token:, user: response(user) }, status: :ok
     else
       render json: { error: 'Invalid email or password' }, status: :unauthorized
     end
