@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::API
+  before_action :authenticate_request!
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
 
   private
